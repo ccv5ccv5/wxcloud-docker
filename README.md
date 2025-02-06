@@ -42,29 +42,7 @@ docker run --rm wxcloud-cli-image -c "wxcloud login"
 docker run --rm wxcloud-cli-image -c "wxcloud login && wxcloud deploy"
 ```
 
-## CI/CD 示例
-
-在 GitHub Actions 中使用示例：
-
-```yaml
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Build wxcloud image
-        run: docker build -t wxcloud-cli-image .
-      - name: Deploy to WxCloud
-        run: |
-          docker run --rm wxcloud-cli-image -c "wxcloud login && wxcloud deploy"
-```
-
 ## 注意事项
 
 - 使用前请确保已获取微信云开发的相关权限和配置
 - 在 CI/CD 环境中使用时，请妥善保管和配置相关密钥
-- 建议在生产环境中使用特定版本的镜像标签，而不是 latest
-
-## 许可证
-
-MIT 
