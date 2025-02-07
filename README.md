@@ -55,14 +55,22 @@ docker run --rm qq406877924/wxcloud-cli-image -c "wxcloud login && wxcloud deplo
 ### CI/CD 集成示例
 
 1. GitHub Actions 中使用：
+
+> 注意：使用前需要在 GitHub 仓库的 Settings -> Secrets and variables -> Actions 中配置以下密钥：
+> - `WX_APPID`: 微信小程序的 AppID
+> - `WX_APPKEY_CLOUD`: 微信云开发的 API 密钥
+> - `WX_STRORAGE_DEV`: 微信云开发环境 ID
+
 ```yaml
-steps:
-  - name: Deploy to WxCloud
-    uses: docker://qq406877924/wxcloud-cli-image:latest
-    with:
-      args: wxcloud deploy
-    env:
-      WXCLOUD_APPID: ${{ secrets.WXCLOUD_APPID }}
+    - name: Upload to WxCloud
+      uses: addnab/docker-run-action@v3
+      with:
+        image: qq406877924/wxcloud-cli-image:latest
+        options: -v ${{ github.workspace }}:/workspace
+        run: |
+          echo "test" > /workspace/testFile
+          wxcloud login -a ${{ secrets.WX_APPID }} -k ${{ secrets.WX_APPKEY_CLOUD }} 
+          wxcloud storage:upload /workspace/testFile --envId=${{ secrets.WX_STRORAGE_DEV }} --mode=storage --remotePath=/
 ```
 
 ## 版本说明
@@ -71,14 +79,6 @@ steps:
 - `${commit-sha}`: 特定提交对应的版本
 - `buildcache`: 构建缓存标签（不要直接使用）
 
-## 注意事项
-
-- 使用前请确保已获取微信云开发的相关权限和配置
-- 在 CI/CD 环境中使用时，请妥善保管和配置相关密钥
-- 建议使用 `-v` 参数挂载本地目录，以确保能够正确访问项目文件
-- 如需交互式操作（如登录），请添加 `-it` 参数
-- 在生产环境中，建议使用特定的提交 SHA 版本，而不是 `latest` 标签
-
 ## 自行构建
 
 如果你需要自定义镜像，可以克隆本仓库并自行构建：
@@ -86,6 +86,14 @@ steps:
 ```bash
 docker build -t wxcloud-cli-image .
 ```
+
+## 注意事项
+
+- 使用前请确保已获取微信云开发的相关权限和配置
+- 在 CI/CD 环境中使用时，请妥善保管和配置相关密钥
+- 建议使用 `-v` 参数挂载本地目录，以确保能够正确访问项目文件
+- 如需交互式操作（如登录），请添加 `-it` 参数
+- 在生产环境中，建议使用特定的提交 SHA 版本，而不是 `latest` 标签
 
 ## 问题反馈
 
